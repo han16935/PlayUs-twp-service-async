@@ -41,7 +41,7 @@ import com.playus.twpservice.domain.party.repository.write.PartyAgeRepository;
 import com.playus.twpservice.domain.party.repository.write.PartyJoinRepository;
 import com.playus.twpservice.domain.party.repository.write.PartyRepository;
 import com.playus.twpservice.domain.party.repository.write.PartyThumbnailUrlRepository;
-import com.playus.twpservice.global.s3.S3Service;
+//import com.playus.twpservice.global.s3.S3Service;
 import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -73,7 +73,7 @@ public class PartyService {
     private final PartyAgeReadOnlyRepository partyAgeReadOnlyRepository;
 
     private final NotificationFeignClient notificationFeignClient;
-    private final S3Service s3Service;
+//    private final S3Service s3Service;
 
     public PartyCreateResponse createParty(Long userId, PartyCreateRequest request) {
         ChatRoom chatRoom = initializeChatRoomAsWriter(userId);
@@ -177,9 +177,9 @@ public class PartyService {
         return PartyApplyResponse.of("직관팟 신청에 성공했습니다!");
     }
 
-    public PresignedUrlForSaveImageResponse generatePresignedUrlForSaveImage(PresignedUrlForSaveImageRequest request) {
-        return new PresignedUrlForSaveImageResponse(s3Service.generatePresignedUrl(request.imageFileName()));
-    }
+//    public PresignedUrlForSaveImageResponse generatePresignedUrlForSaveImage(PresignedUrlForSaveImageRequest request) {
+//        return new PresignedUrlForSaveImageResponse(s3Service.generatePresignedUrl(request.imageFileName()));
+//    }
 
     // 나이, 성별 검증은 이전 승인제 직관팟 신청에서 검증함!
     public PartyApproveResponse approveParty(Long loginUserId, Long partyId, PartyApproveRequest request) {

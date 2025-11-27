@@ -13,46 +13,46 @@ import software.amazon.awssdk.services.s3.presigner.S3Presigner;
 
 import java.net.URI;
 
-@Profile("!test")
-@Configuration
-public class S3Config {
-
-    @Value("${cloud.aws.credentials.access-key}")
-    private String accessKey;
-
-    @Value("${cloud.aws.credentials.secret-key}")
-    private String secretKey;
-
-    @Value("${cloud.aws.s3.endpoint}")
-    private String endpoint;
-
-    @Bean
-    public S3Client s3Client() {
-        return S3Client.builder()
-                .endpointOverride(URI.create(endpoint))
-                .credentialsProvider(
-                        StaticCredentialsProvider.create(
-                                AwsBasicCredentials.create(accessKey, secretKey)
-                        )
-                )
-                .forcePathStyle(true)
-                .region(Region.of("kr-central-2"))
-                .build();
-    }
-
-    @Bean
-    public S3Presigner s3Presigner() {
-        return S3Presigner.builder()
-                .endpointOverride(URI.create(endpoint))
-                .credentialsProvider(
-                        StaticCredentialsProvider.create(
-                                AwsBasicCredentials.create(accessKey, secretKey)
-                        )
-                )
-                .serviceConfiguration(S3Configuration.builder()
-                        .pathStyleAccessEnabled(true)
-                        .build())
-                .region(Region.of("kr-central-2"))
-                .build();
-    }
-}
+//@Profile("!test")
+//@Configuration
+//public class S3Config {
+//
+//    @Value("${cloud.aws.credentials.access-key}")
+//    private String accessKey;
+//
+//    @Value("${cloud.aws.credentials.secret-key}")
+//    private String secretKey;
+//
+//    @Value("${cloud.aws.s3.endpoint}")
+//    private String endpoint;
+//
+//    @Bean
+//    public S3Client s3Client() {
+//        return S3Client.builder()
+//                .endpointOverride(URI.create(endpoint))
+//                .credentialsProvider(
+//                        StaticCredentialsProvider.create(
+//                                AwsBasicCredentials.create(accessKey, secretKey)
+//                        )
+//                )
+//                .forcePathStyle(true)
+//                .region(Region.of("kr-central-2"))
+//                .build();
+//    }
+//
+//    @Bean
+//    public S3Presigner s3Presigner() {
+//        return S3Presigner.builder()
+//                .endpointOverride(URI.create(endpoint))
+//                .credentialsProvider(
+//                        StaticCredentialsProvider.create(
+//                                AwsBasicCredentials.create(accessKey, secretKey)
+//                        )
+//                )
+//                .serviceConfiguration(S3Configuration.builder()
+//                        .pathStyleAccessEnabled(true)
+//                        .build())
+//                .region(Region.of("kr-central-2"))
+//                .build();
+//    }
+//}

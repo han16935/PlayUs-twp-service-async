@@ -31,7 +31,7 @@ dependencies {
 	// Spring
 	implementation 'org.springframework.boot:spring-boot-starter-web'
 	implementation 'org.springframework.boot:spring-boot-starter-validation'
-	implementation 'org.springframework.boot:spring-boot-starter-websocket'
+//	implementation 'org.springframework.boot:spring-boot-starter-websocket'
 	implementation 'org.springframework.boot:spring-boot-starter-security'
 	implementation 'org.springframework.boot:spring-boot-starter-oauth2-client' // OAuth2User 사용 위해
 	implementation group: 'org.apache.commons', name: 'commons-lang3', version: '3.12.0' // for StringUtils
@@ -42,14 +42,14 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-data-redis'
 	implementation 'org.apache.commons:commons-pool2'
 	implementation("org.redisson:redisson-spring-boot-starter:3.46.0") // for applying party!
-	implementation("org.springframework.boot:spring-boot-starter-data-mongodb:3.4.5")
+//	implementation("org.springframework.boot:spring-boot-starter-data-mongodb:3.4.5")
 
 	// MSA
 	implementation 'org.springframework.cloud:spring-cloud-starter-openfeign'
 	implementation 'org.springframework.cloud:spring-cloud-starter-circuitbreaker-resilience4j'
 
 	// Kafka
-	implementation 'org.springframework.kafka:spring-kafka'
+//	implementation 'org.springframework.kafka:spring-kafka'
 
 	// Monitoring
 	implementation 'org.springframework.boot:spring-boot-starter-actuator'
@@ -60,7 +60,7 @@ dependencies {
 	implementation 'io.opentelemetry:opentelemetry-exporter-otlp'
 
 	// Object Storage
-	implementation 'software.amazon.awssdk:s3:2.31.45'
+//	implementation 'software.amazon.awssdk:s3:2.31.45'
 
 	// Lombok
 	compileOnly 'org.projectlombok:lombok'
@@ -91,8 +91,8 @@ dependencies {
 	runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.11.5'
 
 	// Sentry
-	implementation 'io.sentry:sentry-logback:7.17.0'
-	implementation 'com.github.maricn:logback-slack-appender:1.6.1'
+//	implementation 'io.sentry:sentry-logback:7.17.0'
+//	implementation 'com.github.maricn:logback-slack-appender:1.6.1'
 }
 
 dependencyManagement {

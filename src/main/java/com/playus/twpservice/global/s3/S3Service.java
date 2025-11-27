@@ -12,49 +12,49 @@ import software.amazon.awssdk.services.s3.presigner.model.PutObjectPresignReques
 
 import java.time.Duration;
 
-@Slf4j
-@Component
-@RequiredArgsConstructor
-public class S3Service {
-
-    @Value("${cloud.aws.s3.bucket}")
-    private String bucketName;
-
-    private final S3Client s3Client;
-    private final S3Presigner s3Presigner;
-
-    // String fileName = imageUrl.substring(imageUrl.lastIndexOf("/") + 1);
-    public void deleteImage(String imageFileName) {
-
-        DeleteObjectRequest deleteObjectRequest = DeleteObjectRequest.builder()
-                .bucket(bucketName)
-                .key(imageFileName)
-                .build();
-
-        s3Client.deleteObject(deleteObjectRequest);
-
-        log.info("S3에서 이미지 삭제 완료: {}", imageFileName);
-    }
-
-    public String generatePresignedUrl(String imageFileName) {
-
-        PutObjectRequest objectRequest = createPutObjectRequest(imageFileName);
-        PutObjectPresignRequest presignRequest = createPresignedRequest(objectRequest, 10);
-
-        return s3Presigner.presignPutObject(presignRequest).url().toString();
-    }
-
-    private PutObjectRequest createPutObjectRequest(String imageFileName) {
-        return PutObjectRequest.builder()
-                .bucket(bucketName)
-                .key(imageFileName)
-                .build();
-    }
-
-    private static PutObjectPresignRequest createPresignedRequest(PutObjectRequest objectRequest, int minutes) {
-        return PutObjectPresignRequest.builder()
-                .signatureDuration(Duration.ofMinutes(minutes))
-                .putObjectRequest(objectRequest)
-                .build();
-    }
-}
+//@Slf4j
+//@Component
+//@RequiredArgsConstructor
+//public class S3Service {
+//
+//    @Value("${cloud.aws.s3.bucket}")
+//    private String bucketName;
+//
+//    private final S3Client s3Client;
+//    private final S3Presigner s3Presigner;
+//
+//    // String fileName = imageUrl.substring(imageUrl.lastIndexOf("/") + 1);
+//    public void deleteImage(String imageFileName) {
+//
+//        DeleteObjectRequest deleteObjectRequest = DeleteObjectRequest.builder()
+//                .bucket(bucketName)
+//                .key(imageFileName)
+//                .build();
+//
+//        s3Client.deleteObject(deleteObjectRequest);
+//
+//        log.info("S3에서 이미지 삭제 완료: {}", imageFileName);
+//    }
+//
+//    public String generatePresignedUrl(String imageFileName) {
+//
+//        PutObjectRequest objectRequest = createPutObjectRequest(imageFileName);
+//        PutObjectPresignRequest presignRequest = createPresignedRequest(objectRequest, 10);
+//
+//        return s3Presigner.presignPutObject(presignRequest).url().toString();
+//    }
+//
+//    private PutObjectRequest createPutObjectRequest(String imageFileName) {
+//        return PutObjectRequest.builder()
+//                .bucket(bucketName)
+//                .key(imageFileName)
+//                .build();
+//    }
+//
+//    private static PutObjectPresignRequest createPresignedRequest(PutObjectRequest objectRequest, int minutes) {
+//        return PutObjectPresignRequest.builder()
+//                .signatureDuration(Duration.ofMinutes(minutes))
+//                .putObjectRequest(objectRequest)
+//                .build();
+//    }
+//}
