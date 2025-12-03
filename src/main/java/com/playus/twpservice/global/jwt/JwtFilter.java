@@ -34,7 +34,6 @@ import java.util.Objects;
 public class JwtFilter extends OncePerRequestFilter {
 
     private final JwtUtil jwtUtil;
-    private final UserFeignClient userFeignClient;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request,
