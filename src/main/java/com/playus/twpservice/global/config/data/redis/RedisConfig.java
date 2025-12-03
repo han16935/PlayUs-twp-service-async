@@ -2,7 +2,6 @@ package com.playus.twpservice.global.config.data.redis;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import com.playus.twpservice.domain.chat.dto.request.ChattingMessage;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -35,24 +34,24 @@ public class RedisConfig {
     }
 
 
-    @Bean
-    @Qualifier("chatRedisTemplate")
-    public RedisTemplate<String, ChattingMessage> chatRedisTemplate(RedisConnectionFactory redisConnectionFactory) {
-        RedisTemplate<String, ChattingMessage> redisTemplate = new RedisTemplate<>();
-
-        ObjectMapper objectMapper = new ObjectMapper()
-                .registerModule(new JavaTimeModule())
-                .setDateFormat(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss"));
-
-        Jackson2JsonRedisSerializer<ChattingMessage> serializer =
-                new Jackson2JsonRedisSerializer<>(objectMapper, ChattingMessage.class);
-
-        redisTemplate.setConnectionFactory(redisConnectionFactory);
-        redisTemplate.setKeySerializer(new StringRedisSerializer());
-        redisTemplate.setValueSerializer(serializer);
-
-        return redisTemplate;
-    }
+//    @Bean
+//    @Qualifier("chatRedisTemplate")
+//    public RedisTemplate<String, ChattingMessage> chatRedisTemplate(RedisConnectionFactory redisConnectionFactory) {
+//        RedisTemplate<String, ChattingMessage> redisTemplate = new RedisTemplate<>();
+//
+//        ObjectMapper objectMapper = new ObjectMapper()
+//                .registerModule(new JavaTimeModule())
+//                .setDateFormat(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss"));
+//
+//        Jackson2JsonRedisSerializer<ChattingMessage> serializer =
+//                new Jackson2JsonRedisSerializer<>(objectMapper, ChattingMessage.class);
+//
+//        redisTemplate.setConnectionFactory(redisConnectionFactory);
+//        redisTemplate.setKeySerializer(new StringRedisSerializer());
+//        redisTemplate.setValueSerializer(serializer);
+//
+//        return redisTemplate;
+//    }
 
     @Bean
     @Qualifier("chatRoomRedisTemplate")

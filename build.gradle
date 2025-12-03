@@ -42,7 +42,7 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-data-redis'
 	implementation 'org.apache.commons:commons-pool2'
 	implementation("org.redisson:redisson-spring-boot-starter:3.46.0") // for applying party!
-//	implementation("org.springframework.boot:spring-boot-starter-data-mongodb:3.4.5")
+	implementation("org.springframework.boot:spring-boot-starter-data-mongodb:3.4.5")
 
 	// MSA
 	implementation 'org.springframework.cloud:spring-cloud-starter-openfeign'
@@ -60,7 +60,7 @@ dependencies {
 	implementation 'io.opentelemetry:opentelemetry-exporter-otlp'
 
 	// Object Storage
-//	implementation 'software.amazon.awssdk:s3:2.31.45'
+	implementation 'software.amazon.awssdk:s3:2.31.45'
 
 	// Lombok
 	compileOnly 'org.projectlombok:lombok'

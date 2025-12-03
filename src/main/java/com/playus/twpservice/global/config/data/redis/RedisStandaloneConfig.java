@@ -2,7 +2,6 @@ package com.playus.twpservice.global.config.data.redis;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import com.playus.twpservice.domain.chat.dto.request.ChattingMessage;
 import io.lettuce.core.ClientOptions;
 import io.lettuce.core.SocketOptions;
 import org.apache.commons.pool2.impl.GenericObjectPoolConfig;
@@ -90,41 +89,41 @@ public class RedisStandaloneConfig {
         return new LettuceConnectionFactory(redisConfig, clientConfig);
     }
 
-    @Bean
-    @Qualifier("chatRedisTemplate")
-    public RedisTemplate<String, ChattingMessage> chatRedisTemplate(RedisConnectionFactory redisConnectionFactory) {
-        RedisTemplate<String, ChattingMessage> redisTemplate = new RedisTemplate<>();
+//    @Bean
+//    @Qualifier("chatRedisTemplate")
+//    public RedisTemplate<String, ChattingMessage> chatRedisTemplate(RedisConnectionFactory redisConnectionFactory) {
+//        RedisTemplate<String, ChattingMessage> redisTemplate = new RedisTemplate<>();
+//
+//        // 채팅 메시지 직렬화 설정
+//        ObjectMapper objectMapper = new ObjectMapper()
+//                .registerModule(new JavaTimeModule())
+//                .setDateFormat(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss"));
+//
+//        Jackson2JsonRedisSerializer<ChattingMessage> serializer =
+//                new Jackson2JsonRedisSerializer<>(objectMapper, ChattingMessage.class);
+//
+//        redisTemplate.setConnectionFactory(redisConnectionFactory);
+//        redisTemplate.setKeySerializer(new StringRedisSerializer());
+//        redisTemplate.setValueSerializer(serializer);
+//        redisTemplate.setHashKeySerializer(new StringRedisSerializer());
+//        redisTemplate.setHashValueSerializer(serializer);
+//
+//        redisTemplate.afterPropertiesSet();
+//        return redisTemplate;
+//    }
 
-        // 채팅 메시지 직렬화 설정
-        ObjectMapper objectMapper = new ObjectMapper()
-                .registerModule(new JavaTimeModule())
-                .setDateFormat(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss"));
-
-        Jackson2JsonRedisSerializer<ChattingMessage> serializer =
-                new Jackson2JsonRedisSerializer<>(objectMapper, ChattingMessage.class);
-
-        redisTemplate.setConnectionFactory(redisConnectionFactory);
-        redisTemplate.setKeySerializer(new StringRedisSerializer());
-        redisTemplate.setValueSerializer(serializer);
-        redisTemplate.setHashKeySerializer(new StringRedisSerializer());
-        redisTemplate.setHashValueSerializer(serializer);
-
-        redisTemplate.afterPropertiesSet();
-        return redisTemplate;
-    }
-
-    @Bean
-    @Qualifier("chatRoomRedisTemplate")
-    public RedisTemplate<String, Object> chatRoomRedisTemplate(RedisConnectionFactory redisConnectionFactory) {
-        RedisTemplate<String, Object> redisTemplate = new RedisTemplate<>();
-
-        redisTemplate.setConnectionFactory(redisConnectionFactory);
-        redisTemplate.setKeySerializer(new StringRedisSerializer());
-        redisTemplate.setValueSerializer(new GenericJackson2JsonRedisSerializer());
-        redisTemplate.setHashKeySerializer(new StringRedisSerializer());
-        redisTemplate.setHashValueSerializer(new GenericJackson2JsonRedisSerializer());
-
-        redisTemplate.afterPropertiesSet();
-        return redisTemplate;
-    }
+//    @Bean
+//    @Qualifier("chatRoomRedisTemplate")
+//    public RedisTemplate<String, Object> chatRoomRedisTemplate(RedisConnectionFactory redisConnectionFactory) {
+//        RedisTemplate<String, Object> redisTemplate = new RedisTemplate<>();
+//
+//        redisTemplate.setConnectionFactory(redisConnectionFactory);
+//        redisTemplate.setKeySerializer(new StringRedisSerializer());
+//        redisTemplate.setValueSerializer(new GenericJackson2JsonRedisSerializer());
+//        redisTemplate.setHashKeySerializer(new StringRedisSerializer());
+//        redisTemplate.setHashValueSerializer(new GenericJackson2JsonRedisSerializer());
+//
+//        redisTemplate.afterPropertiesSet();
+//        return redisTemplate;
+//    }
 }

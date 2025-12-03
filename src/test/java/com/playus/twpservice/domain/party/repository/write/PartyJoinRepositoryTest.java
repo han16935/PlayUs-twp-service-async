@@ -1,8 +1,6 @@
 package com.playus.twpservice.domain.party.repository.write;
 
 import com.playus.twpservice.IntegrationTestSupport;
-import com.playus.twpservice.domain.chat.entity.ChatRoom;
-import com.playus.twpservice.domain.chat.repository.write.ChatRoomRepository;
 import com.playus.twpservice.domain.party.entity.Party;
 import com.playus.twpservice.domain.party.entity.PartyJoin;
 import com.playus.twpservice.domain.party.enums.PartyGender;
@@ -26,8 +24,6 @@ class PartyJoinRepositoryTest extends IntegrationTestSupport {
 
     @Autowired
     PartyJoinRepository partyJoinRepository;
-    @Autowired
-    private ChatRoomRepository chatRoomRepository;
 
     @AfterEach
     void tearDown() {
@@ -42,19 +38,15 @@ class PartyJoinRepositoryTest extends IntegrationTestSupport {
         Long writerId = 1L;
         Long matchId = 1L;
         Long matchId2 = 2L;
-        ChatRoom chatRoom = ChatRoom.create();
-        ChatRoom chatRoom1 = ChatRoom.create();
-
-        chatRoomRepository.saveAll(List.of(chatRoom, chatRoom1));
 
         Party party = partyRepository.save(Party.create(
                 "title2", "16일 경기 같이 보실 분~", 1L, 15L,
-                PartyGender.FEMALE, PartyJoinMethod.RESERVATION, writerId, matchId, chatRoom)
+                PartyGender.FEMALE, PartyJoinMethod.RESERVATION, writerId, matchId)
         );
 
         Party otherParty = partyRepository.save(Party.create(
                 "title2", "16일 경기 같이 보실 분~", 1L, 15L,
-                PartyGender.FEMALE, PartyJoinMethod.RESERVATION, writerId, matchId2, chatRoom1)
+                PartyGender.FEMALE, PartyJoinMethod.RESERVATION, writerId, matchId2)
         );
 
         partyJoinRepository.saveAll(List.of(

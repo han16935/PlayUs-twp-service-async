@@ -130,8 +130,8 @@ public class PartyController implements PartyControllerSpecification {
         return partyReadOnlyService.getAppliedParties(principal);
     }
 
-    @PostMapping("/presigned-url")
-    public PresignedUrlForSaveImageResponse generatePresignedUrlForSaveImage(@Valid @RequestBody PresignedUrlForSaveImageRequest request) {
-        return partyService.generatePresignedUrlForSaveImage(request);
-    }
+//    @PostMapping("/presigned-url")
+//    public PresignedUrlForSaveImageResponse generatePresignedUrlForSaveImage(@Valid @RequestBody PresignedUrlForSaveImageRequest request) {
+//        return partyService.generatePresignedUrlForSaveImage(request);
+//    }
 }

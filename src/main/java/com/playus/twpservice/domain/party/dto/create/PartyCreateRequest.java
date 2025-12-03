@@ -1,6 +1,5 @@
 package com.playus.twpservice.domain.party.dto.create;
 
-import com.playus.twpservice.domain.chat.entity.ChatRoom;
 import com.playus.twpservice.domain.common.validation.MinimumMaximumValidatable;
 import com.playus.twpservice.global.validation.ValidEnum;
 import com.playus.twpservice.global.validation.ValidEnumList;
@@ -74,7 +73,7 @@ public record PartyCreateRequest (
                 .build();
     }
 
-    public Party toPartyWith(Long userId, ChatRoom chatRoom) {
-        return Party.create(title, message, minimumParticipants, maximumParticipants, PartyGender.toEnumValue(partyGender), PartyJoinMethod.toEnumValue(partyJoinMethod), userId, matchId, chatRoom);
+    public Party toPartyWith(Long userId) {
+        return Party.create(title, message, minimumParticipants, maximumParticipants, PartyGender.toEnumValue(partyGender), PartyJoinMethod.toEnumValue(partyJoinMethod), userId, matchId);
     }
 }

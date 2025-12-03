@@ -56,9 +56,6 @@ public class PartyDocument {
     @Field(name = "match_id")
     private Long matchId;
 
-    @NotNull
-    @Field(name = "chat_room_id")
-    private Long chatRoomId;
 
     @NotNull
     private String text;
@@ -75,7 +72,7 @@ public class PartyDocument {
 
     @Builder
     private PartyDocument(Long id, String title, String text, Long minimumParticipants, Long maximumParticipants, Long currentParticipants,
-                          PartyGender partyGender, PartyJoinMethod partyJoinMethod, Long writerId, Long matchId, Boolean isEnded, Long chatRoomId) {
+                          PartyGender partyGender, PartyJoinMethod partyJoinMethod, Long writerId, Long matchId, Boolean isEnded) {
         this.id = id;
         this.title = title;
         this.text = text;
@@ -86,13 +83,12 @@ public class PartyDocument {
         this.partyJoinMethod = partyJoinMethod;
         this.matchId = matchId;
         this.isEnded = isEnded;
-        this.chatRoomId = chatRoomId;
         this.writerId = writerId;
     }
 
     public static PartyDocument createForOnlyTest(Long id, String title, String text, Long minimumParticipants,
                                                   Long maximumParticipants, Long currentParticipantsCount, PartyGender partyGender, PartyJoinMethod partyJoinMethod,
-                                                  Long writerId, Long matchId, Boolean isEnded, Long chatRoomId) {
+                                                  Long writerId, Long matchId, Boolean isEnded) {
         return PartyDocument.builder()
                 .id(id)
                 .title(title)
@@ -105,7 +101,6 @@ public class PartyDocument {
                 .writerId(writerId)
                 .matchId(matchId)
                 .isEnded(isEnded)
-                .chatRoomId(chatRoomId)
                 .build();
     }
 }

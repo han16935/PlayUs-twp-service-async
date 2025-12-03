@@ -1,11 +1,5 @@
 package com.playus.twpservice.domain.party.service;
 
-import com.playus.twpservice.domain.chat.entity.ChatParticipant;
-import com.playus.twpservice.domain.chat.entity.ChatRoom;
-import com.playus.twpservice.domain.chat.repository.message.ChatMessageRepository;
-import com.playus.twpservice.domain.chat.repository.write.ChatParticipantRepository;
-import com.playus.twpservice.domain.chat.repository.write.ChatRoomRepository;
-import com.playus.twpservice.domain.chat.service.ChatRoomService;
 import com.playus.twpservice.domain.common.security.CustomOAuth2User;
 import com.playus.twpservice.domain.common.security.Gender;
 import com.playus.twpservice.domain.party.assertion.PartyAssert;
@@ -63,10 +57,10 @@ public class PartyService {
     private final PartyAgeRepository partyAgeRepository;
     private final PartyThumbnailUrlRepository partyThumbnailUrlRepository;
 
-    private final ChatRoomRepository chatRoomRepository;
-    private final ChatParticipantRepository chatParticipantRepository;
-    private final ChatMessageRepository chatMessageRepository;
-    private final ChatRoomService chatRoomService;
+//    private final ChatRoomRepository chatRoomRepository;
+//    private final ChatParticipantRepository chatParticipantRepository;
+//    private final ChatMessageRepository chatMessageRepository;
+//    private final ChatRoomService chatRoomService;
 
     private final PartyReadOnlyRepository partyReadOnlyRepository;
     private final PartyJoinReadOnlyRepository partyJoinReadOnlyRepository;
@@ -76,20 +70,19 @@ public class PartyService {
 //    private final S3Service s3Service;
 
     public PartyCreateResponse createParty(Long userId, PartyCreateRequest request) {
-        ChatRoom chatRoom = initializeChatRoomAsWriter(userId);
 
         if (partyReadOnlyRepository.existsByWriterId(userId)) {
             throw new AlreadyCreatedPartyForPerMatchException("하나의 경기에 대해 하나의 직관팟만 만들 수 있습니다!");
         }
 
-        Party party = partyRepository.save(request.toPartyWith(userId, chatRoom));
+        Party party = partyRepository.save(request.toPartyWith(userId));
 
         List<PartyAge> partyAgeList = toPartyAgeEntity(request, party);
         partyAgeRepository.saveAll(partyAgeList);
 
         saveThumbnailUrlIfPresent(request, party);
 
-        return PartyCreateResponse.of(party.getId(), chatRoom.getId());
+        return PartyCreateResponse.of(party.getId());
     }
 
     public PartyUpdateResponse updateParty(Long userId, PartyIdRequest idRequest, PartyUpdateRequest updateRequest) {
@@ -120,12 +113,6 @@ public class PartyService {
         partyAgeRepository.deleteByPartyId(partyId);
         partyJoinRepository.deleteByPartyId(partyId);
         partyRepository.deleteById(partyId);
-
-        Long chatRoomId = partyDocument.getChatRoomId();
-
-        chatMessageRepository.deleteAllByChatRoomId(chatRoomId);
-        chatParticipantRepository.deleteByChatRoomId(chatRoomId);
-        chatRoomRepository.deleteById(chatRoomId);
 
         return PartyDeleteResponse.of(partyId);
     }
@@ -159,7 +146,6 @@ public class PartyService {
                 party.getId(), party.getTitle(), party.getWriterId(), userId
         ));
 
-        chatParticipantRepository.save(ChatParticipant.of(party.getChatRoom(), userId));
     }
 
     public PartyApplyResponse applyParty(CustomOAuth2User oauth2User, Long partyId, String requireMessage) {
@@ -176,10 +162,6 @@ public class PartyService {
 
         return PartyApplyResponse.of("직관팟 신청에 성공했습니다!");
     }
-
-//    public PresignedUrlForSaveImageResponse generatePresignedUrlForSaveImage(PresignedUrlForSaveImageRequest request) {
-//        return new PresignedUrlForSaveImageResponse(s3Service.generatePresignedUrl(request.imageFileName()));
-//    }
 
     // 나이, 성별 검증은 이전 승인제 직관팟 신청에서 검증함!
     public PartyApproveResponse approveParty(Long loginUserId, Long partyId, PartyApproveRequest request) {
@@ -220,9 +202,6 @@ public class PartyService {
             return PartyApproveResponse.of("직관팟 가입 신청 거절 성공했습니다!");
         }
 
-        // 5. partyId와 user 가진 ChatPart 저장
-        chatParticipantRepository.save(ChatParticipant.of(party.getChatRoom(), applicantUserId));
-
         // 6. response return
         return PartyApproveResponse.of("직관팟 가입 신청 승인 성공했습니다!");
     }
@@ -238,8 +217,6 @@ public class PartyService {
                 .orElseThrow(() -> new ApplicantNotFoundException("직관팟에 참여한 사람만 탈퇴할 수 있습니다!"));
 
         PartyAssert.isAcceptedUser(partyJoin.getPartyJoinRequestStatus());
-
-        chatRoomService.exitChatRoom(party.getChatRoom().getId(), loginUserId);
 
         partyJoinRepository.delete(partyJoin);
         party.decreaseCurrentMember();
@@ -303,12 +280,6 @@ public class PartyService {
                         .map(thumbnailUrl -> PartyThumbnailUrl.create(savedParty, thumbnailUrl))
                         .toList()
         );
-    }
-
-    private ChatRoom initializeChatRoomAsWriter(Long userId) {
-        ChatRoom chatRoom = chatRoomRepository.save(ChatRoom.create());
-        chatParticipantRepository.save(ChatParticipant.of(chatRoom, userId));
-        return chatRoom;
     }
 
     private void saveThumbnailUrlIfPresent(PartyCreateRequest request, Party party) {

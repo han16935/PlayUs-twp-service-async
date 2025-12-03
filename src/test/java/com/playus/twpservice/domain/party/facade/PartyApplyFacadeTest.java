@@ -1,10 +1,6 @@
 package com.playus.twpservice.domain.party.facade;
 
 import com.playus.twpservice.IntegrationTestSupport;
-import com.playus.twpservice.domain.chat.entity.ChatParticipant;
-import com.playus.twpservice.domain.chat.entity.ChatRoom;
-import com.playus.twpservice.domain.chat.repository.write.ChatParticipantRepository;
-import com.playus.twpservice.domain.chat.repository.write.ChatRoomRepository;
 import com.playus.twpservice.domain.common.security.CustomOAuth2User;
 import com.playus.twpservice.domain.common.security.Gender;
 import com.playus.twpservice.domain.common.security.Role;
@@ -50,11 +46,6 @@ class PartyApplyFacadeTest extends IntegrationTestSupport {
     @Autowired
     private PartyAgeReadOnlyRepository partyAgeReadOnlyRepository;
 
-    @Autowired
-    private ChatRoomRepository chatRoomRepository;
-
-    @Autowired
-    private ChatParticipantRepository chatParticipantRepository;
 
     @MockitoBean
     private NotificationFeignClient notificationFeignClient;
@@ -64,8 +55,6 @@ class PartyApplyFacadeTest extends IntegrationTestSupport {
         partyJoinRepository.deleteAll();
         partyRepository.deleteAll();
 
-        chatParticipantRepository.deleteAll();
-        chatRoomRepository.deleteAll();
 
         partyAgeReadOnlyRepository.deleteAll();
         partyJoinReadOnlyRepository.deleteAll();
@@ -83,11 +72,9 @@ class PartyApplyFacadeTest extends IntegrationTestSupport {
 
         Long maximumParticipants = 10L;
 
-        ChatRoom chatRoom = chatRoomRepository.save(ChatRoom.create());
-        chatParticipantRepository.save(ChatParticipant.of(chatRoom, userId));
         Party party = partyRepository.save(Party.create(
                 "title", "설명", 1L, maximumParticipants,
-                PartyGender.FEMALE, PartyJoinMethod.RESERVATION, writerId, matchId, chatRoom
+                PartyGender.FEMALE, PartyJoinMethod.RESERVATION, writerId, matchId
         ));
 
         partyJoinReadOnlyRepository.saveAll(List.of(
@@ -122,6 +109,5 @@ class PartyApplyFacadeTest extends IntegrationTestSupport {
         Party afterParty = partyRepository.findAll().get(0);
         assertThat(afterParty.getCurrentParticipants()).isEqualTo(afterParty.getMaximumParticipants());
         assertThat(partyJoinRepository.count()).isEqualTo(maximumParticipants - 1); // 직관팟 작성자는 PartyJoin에 들어가지 않음
-        assertThat(chatParticipantRepository.count()).isEqualTo(maximumParticipants);
     }
 }
