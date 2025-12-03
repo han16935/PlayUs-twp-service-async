@@ -55,10 +55,10 @@ public class JwtFilter extends OncePerRequestFilter {
 
         if (token != null) {
             try {
-                ResponseEntity<TokenValidationResponse> tokenResponse = userFeignClient.checkBlackList(TokenValidationRequest.of(token));
-                if (Objects.requireNonNull(tokenResponse.getBody()).blacklisted()) {
-                    throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "BLACKLISTED_TOKEN");
-                }
+//                ResponseEntity<TokenValidationResponse> tokenResponse = userFeignClient.checkBlackList(TokenValidationRequest.of(token));
+//                if (Objects.requireNonNull(tokenResponse.getBody()).blacklisted()) {
+//                    throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "BLACKLISTED_TOKEN");
+//                }
 
                 if (!jwtUtil.isExpired(token)) {
                     String userId = jwtUtil.getUserId(token);
