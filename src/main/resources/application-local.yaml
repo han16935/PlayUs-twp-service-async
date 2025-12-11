@@ -36,48 +36,6 @@ spring:
   jwt:
     secret: ${JWT_SECRET}
 
-#  kafka:
-#    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS}
-#    producer:
-#      retries: ${KAFKA_PRODUCER_RETRIES}
-#      acks: ${KAFKA_PRODUCER_ACKS}
-#      properties:
-#        enable.idempotence: ${KAFKA_PRODUCER_ENABLE_IDEMPOTENCE}
-#        max.in.flight.requests.per.connection: ${KAFKA_PRODUCER_MAX_IN_FLIGHT_REQUESTS_PER_CONNECTION}
-#    consumer:
-#      group-id: ${KAFKA_CONSUMER_GROUP_ID}
-#      chat-group-id: ${KAFKA_CHAT_CONSUMER_GROUP_ID}
-#      auto-offset-reset: ${KAFKA_CONSUMER_AUTO_OFFSET_RESET}
-#      enable-auto-commit: ${KAFKA_CONSUMER_ENABLE_AUTO_COMMIT}
-#    admin:
-#      properties:
-#        client.id: ${KAFKA_ADMIN_CLIENT_ID}
-#    topics:
-#      chat-room: ${KAFKA_TOPIC_CHAT_ROOM}
-#    partition-count: ${KAFKA_PARTITION_COUNT}
-#    replication-factor: ${KAFKA_REPLICATION_FACTOR}
-
-#cloud:
-#  aws:
-#    credentials:
-#      access-key: ${STORAGE_ACCESS_KEY}
-#      secret-key: ${STORAGE_SECRET_KEY}
-#    s3:
-#      bucket : ${BUCKET_NAME}
-#      endpoint : ${BUCKET_ENDPOINT}
-
-#sentry:
-#  dsn: ${SENTRY_REPOSITORY_DSN}
-#  environment: ${SENTRY_ENVIRONMENT}
-#  servername: ${SENTRY_SERVERNAME}
-#  repository-uri: ${SENTRY_REPOSITORY_URI}
-#
-#logging:
-#  config: classpath:logback-spring.xml
-#
-#slack:
-#  webhook-url: ${SLACK_WEBHOOK_URL}
-
 resilience4j:
   circuitbreaker:
     configs:
