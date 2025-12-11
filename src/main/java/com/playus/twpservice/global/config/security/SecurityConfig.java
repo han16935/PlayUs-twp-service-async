@@ -25,7 +25,6 @@ import org.springframework.web.cors.CorsConfigurationSource;
 public class SecurityConfig {
 
     private final JwtUtil jwtUtil;
-    private final UserFeignClient userFeignClient;
     private final CorsConfigurationSource corsConfigurationSource;
 
     private String [] getWhiteList() {
@@ -52,7 +51,7 @@ public class SecurityConfig {
 
                 // JWT 필터를 UsernamePasswordAuthenticationFilter 앞에 등록
                 .addFilterBefore(
-                        new JwtFilter(jwtUtil, userFeignClient),
+                        new JwtFilter(jwtUtil),
                         UsernamePasswordAuthenticationFilter.class
                 )
 
