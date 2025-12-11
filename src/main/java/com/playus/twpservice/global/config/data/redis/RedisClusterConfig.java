@@ -19,7 +19,7 @@ import java.time.Duration;
 @Profile({"dev", "prod"})  // dev, prod 프로필에서만 사용
 public class RedisClusterConfig {
 
-    @Value("${spring.data.redis.host}")
+    @Value("${spring.data.redis.cluster.nodes}")
     private String host;
 
     @Bean
