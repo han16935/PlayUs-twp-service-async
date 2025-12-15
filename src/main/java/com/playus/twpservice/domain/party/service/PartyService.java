@@ -139,8 +139,8 @@ public class PartyService {
 
         Long userId = validateApplyCondition(oauth2User, partyId, party);
 
-        partyJoinRepository.save(PartyJoin.create(userId, party, PartyJoinRequestStatus.ACCEPT, null));
         party.increaseCurrentParticipants();
+        partyJoinRepository.save(PartyJoin.create(userId, party, PartyJoinRequestStatus.ACCEPT, null));
 
         notificationFeignClient.notifyParty(PartyNotificationEvent.joined(
                 party.getId(), party.getTitle(), party.getWriterId(), userId
