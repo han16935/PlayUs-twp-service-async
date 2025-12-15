@@ -71,7 +71,7 @@ public class PartyService {
 
     public PartyCreateResponse createParty(Long userId, PartyCreateRequest request) {
 
-        if (partyReadOnlyRepository.existsByWriterId(userId)) {
+        if (partyRepository.existsByWriterId(userId)) {
             throw new AlreadyCreatedPartyForPerMatchException("하나의 경기에 대해 하나의 직관팟만 만들 수 있습니다!");
         }
 
@@ -145,7 +145,6 @@ public class PartyService {
         notificationFeignClient.notifyParty(PartyNotificationEvent.joined(
                 party.getId(), party.getTitle(), party.getWriterId(), userId
         ));
-
     }
 
     public PartyApplyResponse applyParty(CustomOAuth2User oauth2User, Long partyId, String requireMessage) {
