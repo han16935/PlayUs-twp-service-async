@@ -19,17 +19,21 @@ import java.time.Duration;
 @Profile({"dev", "prod"})  // dev, prod 프로필에서만 사용
 public class RedisClusterConfig {
 
-    @Value("${spring.data.redis.cluster.nodes}")
+    @Value("${spring.data.redis.host}")
     private String host;
 
     @Bean
     public RedisConnectionFactory redisConnectionFactory() {
-        RedisStandaloneConfiguration redisStandaloneConfiguration = new RedisStandaloneConfiguration();
-        redisStandaloneConfiguration.setHostName(host);
-        redisStandaloneConfiguration.setPort(6379);
+        RedisStandaloneConfiguration redisStandaloneConfiguration =
+                new RedisStandaloneConfiguration(host, 6379);
 
-        // SSL 사용 위해
-        LettuceClientConfiguration lettuceClientConfiguration = LettuceClientConfiguration.builder().useSsl().disablePeerVerification().build();
-        return new LettuceConnectionFactory(redisStandaloneConfiguration, lettuceClientConfiguration);
+        LettuceClientConfiguration lettuceClientConfiguration =
+                LettuceClientConfiguration.builder()
+                        .build();
+
+        return new LettuceConnectionFactory(
+                redisStandaloneConfiguration,
+                lettuceClientConfiguration
+        );
     }
 }
