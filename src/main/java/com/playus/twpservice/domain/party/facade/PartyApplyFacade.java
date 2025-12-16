@@ -20,7 +20,7 @@ public class PartyApplyFacade {
         RLock lock = redissonClient.getLock(partyId.toString());
         boolean isLocked = false;
         try {
-            isLocked = lock.tryLock(10, 1, TimeUnit.SECONDS);
+            isLocked = lock.tryLock(10, TimeUnit.SECONDS);
             if (isLocked) {
                 partyService.applyPartyFCFS(oauth2User, partyId);
             }
