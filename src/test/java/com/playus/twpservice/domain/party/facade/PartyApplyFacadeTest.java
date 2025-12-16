@@ -8,12 +8,14 @@ import com.playus.twpservice.domain.common.security.UserDto;
 import com.playus.twpservice.domain.party.document.PartyAgeDocument;
 import com.playus.twpservice.domain.party.document.PartyJoinDocument;
 import com.playus.twpservice.domain.party.entity.Party;
+import com.playus.twpservice.domain.party.entity.PartyAge;
 import com.playus.twpservice.domain.party.enums.PartyGender;
 import com.playus.twpservice.domain.party.enums.PartyJoinMethod;
 import com.playus.twpservice.domain.party.enums.PartyJoinRequestStatus;
 import com.playus.twpservice.domain.common.feign.client.NotificationFeignClient;
 import com.playus.twpservice.domain.party.repository.read.PartyAgeReadOnlyRepository;
 import com.playus.twpservice.domain.party.repository.read.PartyJoinReadOnlyRepository;
+import com.playus.twpservice.domain.party.repository.write.PartyAgeRepository;
 import com.playus.twpservice.domain.party.repository.write.PartyJoinRepository;
 import com.playus.twpservice.domain.party.repository.write.PartyRepository;
 import org.junit.jupiter.api.AfterEach;
@@ -46,15 +48,18 @@ class PartyApplyFacadeTest extends IntegrationTestSupport {
     @Autowired
     private PartyAgeReadOnlyRepository partyAgeReadOnlyRepository;
 
+    @Autowired
+    private PartyAgeRepository partyAgeRepository;
+
 
     @MockitoBean
     private NotificationFeignClient notificationFeignClient;
 
     @AfterEach
     void tearDown() {
+        partyAgeReadOnlyRepository.deleteAll();
         partyJoinRepository.deleteAll();
         partyRepository.deleteAll();
-
 
         partyAgeReadOnlyRepository.deleteAll();
         partyJoinReadOnlyRepository.deleteAll();
@@ -83,9 +88,9 @@ class PartyApplyFacadeTest extends IntegrationTestSupport {
                 PartyJoinDocument.createForOnlyTest(3L, 4L, party.getId(), PartyJoinRequestStatus.REFUSE, null)
         ));
 
-        partyAgeReadOnlyRepository.saveAll(List.of(
-                PartyAgeDocument.createForOnlyTest(1L, party.getId(), 10),
-                PartyAgeDocument.createForOnlyTest(2L, party.getId(), 20)
+        partyAgeRepository.saveAll(List.of(
+                PartyAge.create(party, 10),
+                PartyAge.create(party, 20)
         ));
 
         int threadCount = 100; // 총 100개의 thread 사용될 예정
