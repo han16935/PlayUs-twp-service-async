@@ -247,19 +247,19 @@ public class PartyService {
 
     private Long validateApplyCondition(CustomOAuth2User oauth2User, Long partyId, Party party) {
         Long userId = oauth2User.getId();
-//        Gender userGender = oauth2User.getUserDto().getGender();
-//        PartyAgeGroup userAgeGroup = PartyAgeGroup.getAgeGroupByAge(oauth2User.getUserDto().getAge());
-//
-//        PartyAssert.isParticipatedPartyAsWriter(userId, party.getWriterId(), "직관팟 작성자는 지원할 수 없습니다!");
-//
+        Gender userGender = oauth2User.getUserDto().getGender();
+        PartyAgeGroup userAgeGroup = PartyAgeGroup.getAgeGroupByAge(oauth2User.getUserDto().getAge());
+
+        PartyAssert.isParticipatedPartyAsWriter(userId, party.getWriterId(), "직관팟 작성자는 지원할 수 없습니다!");
+
 //        throwIfAlreadyAppliedToParty(userId, partyId);
-//
-//        List<PartyAgeGroup> partyAgeGroupList = partyAgeReadOnlyRepository.findByPartyId(party.getId())
-//                .stream()
-//                .map(partyAgeDocument -> PartyAgeGroup.getAgeGroupByAge(partyAgeDocument.getAge()))
-//                .toList();
-//
-//        PartyAssert.isAppliableParty(party, partyAgeGroupList, userGender, userAgeGroup);
+
+        List<PartyAgeGroup> partyAgeGroupList = partyAgeRepository.findByPartyId(party.getId())
+                .stream()
+                .map(partyAge -> PartyAgeGroup.getAgeGroupByAge(partyAge.getAge()))
+                .toList();
+
+        PartyAssert.isAppliableParty(party, partyAgeGroupList, userGender, userAgeGroup);
         return userId;
     }
 
