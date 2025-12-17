@@ -36,14 +36,13 @@ import com.playus.twpservice.domain.party.repository.write.PartyJoinRepository;
 import com.playus.twpservice.domain.party.repository.write.PartyRepository;
 import com.playus.twpservice.domain.party.repository.write.PartyThumbnailUrlRepository;
 //import com.playus.twpservice.global.s3.S3Service;
-import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 import static com.playus.twpservice.domain.party.exception.entity.PartyException.*;
 
@@ -57,6 +56,7 @@ public class PartyService {
     private final PartyAgeRepository partyAgeRepository;
     private final PartyThumbnailUrlRepository partyThumbnailUrlRepository;
 
+    private final ApplicationEventPublisher eventPublisher;
 //    private final ChatRoomRepository chatRoomRepository;
 //    private final ChatParticipantRepository chatParticipantRepository;
 //    private final ChatMessageRepository chatMessageRepository;
@@ -142,9 +142,11 @@ public class PartyService {
         party.increaseCurrentParticipants();
         partyJoinRepository.save(PartyJoin.create(userId, party, PartyJoinRequestStatus.ACCEPT, null));
 
-        notificationFeignClient.notifyParty(PartyNotificationEvent.joined(
-                party.getId(), party.getTitle(), party.getWriterId(), userId
-        ));
+        eventPublisher.publishEvent(
+                PartyNotificationEvent.joined(
+                        party.getId(), party.getTitle(), party.getWriterId(), userId
+                )
+        );
     }
 
     public PartyApplyResponse applyParty(CustomOAuth2User oauth2User, Long partyId, String requireMessage) {
@@ -155,9 +157,11 @@ public class PartyService {
 
         partyJoinRepository.save(PartyJoin.create(userId, party, PartyJoinRequestStatus.WAIT, requireMessage));
 
-        notificationFeignClient.notifyParty(PartyNotificationEvent.request(
-                partyId, party.getTitle(), party.getWriterId(), userId, PartyJoinRequestStatus.WAIT.getMessage(), requireMessage
-        ));
+        eventPublisher.publishEvent(
+                PartyNotificationEvent.request(
+                        partyId, party.getTitle(), party.getWriterId(), userId, PartyJoinRequestStatus.WAIT.getMessage(), requireMessage
+                )
+        );
 
         return PartyApplyResponse.of("직관팟 신청에 성공했습니다!");
     }
