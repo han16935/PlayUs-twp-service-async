@@ -36,6 +36,12 @@ spring:
   jwt:
     secret: ${JWT_SECRET}
 
+thread-pool:
+  noti:
+    core-size: ${NOTI_THREAD_CORE_SIZE}
+    max-size: ${NOTI_THREAD_MAX_SIZE}
+    queue-capacity: ${NOTI_THREAD_QUEUE_CAPACITY}
+
 resilience4j:
   circuitbreaker:
     configs:
