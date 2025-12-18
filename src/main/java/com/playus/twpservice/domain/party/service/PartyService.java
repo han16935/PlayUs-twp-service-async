@@ -193,15 +193,25 @@ public class PartyService {
             party.increaseCurrentParticipants();
             partyJoin.approve();
             partyJoinRepository.save(partyJoin);
-            notificationFeignClient.notifyParty(PartyNotificationEvent.approveResult(
-                    partyId, party.getTitle(), writerId, loginUserId, true)
+
+            eventPublisher.publishEvent(
+                    PartyNotificationEvent.approveResult(
+                            partyId, party.getTitle(), writerId, loginUserId, true)
             );
+//            notificationFeignClient.notifyParty(PartyNotificationEvent.approveResult(
+//                    partyId, party.getTitle(), writerId, loginUserId, true)
+//            );
         } else {
             partyJoin.refuse();
             partyJoinRepository.save(partyJoin);
-            notificationFeignClient.notifyParty(PartyNotificationEvent.approveResult(
-                    partyId, party.getTitle(), writerId, loginUserId, false)
+            eventPublisher.publishEvent(
+                    PartyNotificationEvent.approveResult(
+                            partyId, party.getTitle(), writerId, loginUserId, false)
             );
+
+//            notificationFeignClient.notifyParty(PartyNotificationEvent.approveResult(
+//                    partyId, party.getTitle(), writerId, loginUserId, false)
+//            );
             return PartyApproveResponse.of("직관팟 가입 신청 거절 성공했습니다!");
         }
 
