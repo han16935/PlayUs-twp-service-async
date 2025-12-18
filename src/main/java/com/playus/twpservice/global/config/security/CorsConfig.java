@@ -3,6 +3,7 @@ package com.playus.twpservice.global.config.security;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import org.springframework.context.annotation.Primary;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -17,6 +18,7 @@ public class CorsConfig {
             "http://localhost:3000"
     );
 
+    @Primary
     @Bean("corsConfigurationSource")
     public CorsConfigurationSource corsConfigurationSource() {
 
