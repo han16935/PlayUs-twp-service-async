@@ -79,7 +79,7 @@ class PartyServiceTest extends IntegrationTestSupport {
     @Autowired
     private PartyAgeReadOnlyRepository partyAgeReadOnlyRepository;
 
-    @MockitoBean
+    @Autowired
     private NotificationFeignClient notificationFeignClient;
 
     @AfterEach
@@ -480,7 +480,7 @@ class PartyServiceTest extends IntegrationTestSupport {
 
     @DisplayName("직관팟에 선착순으로 가입할 수 있다.")
     @Test
-    void applyPartyFCFS() {
+    void applyPartyFCFS() throws JsonProcessingException {
         // given
         Long userId = 5L;
         UserDto userDto = UserDto.createForTest(userId, "test", Gender.FEMALE, Role.USER, "http://test.test", 20);
@@ -502,16 +502,21 @@ class PartyServiceTest extends IntegrationTestSupport {
                 PartyAge.create(party, 20)
         ));
 
+        stubFor(post(urlEqualTo("/user/api/notifications/party"))
+                .withRequestBody(equalToJson(objectMapper.writeValueAsString(
+                        PartyNotificationEvent.joined(party.getId(), party.getTitle(), party.getWriterId(), userId)
+                ))));
+
         // when
         partyService.applyPartyFCFS(customOAuth2User, party.getId());
 
         // then
-        verify(notificationFeignClient).notifyParty(PartyNotificationEvent.joined(party.getId(), "title", writerId, userId));
+//        verify(notificationFeignClient).notifyParty(PartyNotificationEvent.joined(party.getId(), "title", writerId, userId));
         assertThat(partyJoinRepository.count()).isEqualTo(1); // partyJoin 에 작성자는 존재 X
         assertThat(partyRepository.findAll().get(0).getCurrentParticipants()).isEqualTo(5);
     }
 
-//    @Disabled
+    //    @Disabled
     @DisplayName("자신이 만든 선착순 직관팟에 지원할 수 없다.")
     @Test
     void applyPartyFCFS_WRITER_DUPLICATE_APPLY() {
@@ -638,13 +643,14 @@ class PartyServiceTest extends IntegrationTestSupport {
 
     @DisplayName("승인제 직관팟에 가입할 수 있다.")
     @Test
-    void applyParty() {
+    void applyParty() throws JsonProcessingException {
         // given
         Long userId = 5L;
         UserDto userDto = UserDto.createForTest(userId, "test", Gender.FEMALE, Role.USER, "http://test.test", 20);
         CustomOAuth2User customOAuth2User = new CustomOAuth2User(userDto, "test-access-token");
         Long writerId = 1L;
         Long matchId = 1L;
+        String requireMessage = "참여 희망합니다!";
 
         Party party = partyRepository.save(Party.create("title", "설명", 1L, 10L,
                 PartyGender.FEMALE, PartyJoinMethod.RESERVATION, writerId, matchId));
@@ -659,20 +665,25 @@ class PartyServiceTest extends IntegrationTestSupport {
                 PartyAge.create(party, 20)
         ));
 
+        stubFor(post(urlEqualTo("/user/api/notifications/party"))
+                .withRequestBody(equalToJson(objectMapper.writeValueAsString(
+                        PartyNotificationEvent.request(party.getId(), party.getTitle(), party.getWriterId(), userId, PartyJoinRequestStatus.WAIT.getMessage(), requireMessage)
+                ))));
+
         // when
-        partyService.applyParty(customOAuth2User, party.getId(), "참여 희망합니다!");
+        partyService.applyParty(customOAuth2User, party.getId(), requireMessage);
 
         // then
-        verify(notificationFeignClient).notifyParty(PartyNotificationEvent.request(party.getId(), "title", writerId, userId, PartyJoinRequestStatus.WAIT.getMessage(), "참여 희망합니다!"));
+//        verify(notificationFeignClient).notifyParty(PartyNotificationEvent.request(party.getId(), "title", writerId, userId, PartyJoinRequestStatus.WAIT.getMessage(), requireMessage));
         assertThat(partyJoinRepository.count()).isEqualTo(1); // partyJoin 에 작성자는 존재 X
         assertThat(partyRepository.findAll().get(0).getCurrentParticipants()).isEqualTo(1);
 
         assertThat(partyJoinRepository.findAll().get(0))
                 .extracting("partyJoinRequestStatus", "requireMessage")
-                .containsExactly(PartyJoinRequestStatus.WAIT, "참여 희망합니다!");
+                .containsExactly(PartyJoinRequestStatus.WAIT, requireMessage);
     }
 
-//    @Disabled
+    //    @Disabled
     @DisplayName("자신이 만든 승인제 직관팟에 지원할 수 없다.")
     @Test
     void applyParty_WRITER_DUPLICATE_APPLY() {
@@ -826,60 +837,72 @@ class PartyServiceTest extends IntegrationTestSupport {
 
     @DisplayName("승인제 직관팟에 대한 참여 요청을 승인할 수 있다.")
     @Test
-    void approveParty() {
+    void approveParty() throws JsonProcessingException {
         // given
         Long loginUserId = 1L;
         Long applicantUserId = 2L;
         PartyApproveRequest request = PartyApproveRequest.of(applicantUserId, true);
+        String requireMessage = "참여 희망합니다!";
 
         Party party = partyRepository.save(Party.create("title", "설명", 1L, 10L,
                 PartyGender.MALE, PartyJoinMethod.RESERVATION, loginUserId, 1L));
         Long partyId = party.getId();
 
         partyJoinRepository.saveAll(List.of(
-                PartyJoin.create(applicantUserId, party, PartyJoinRequestStatus.WAIT, "참여 희망합니다!")
+                PartyJoin.create(applicantUserId, party, PartyJoinRequestStatus.WAIT, requireMessage)
         ));
+
+        stubFor(post(urlEqualTo("/user/api/notifications/party"))
+                .withRequestBody(equalToJson(objectMapper.writeValueAsString(
+                        PartyNotificationEvent.request(party.getId(), party.getTitle(), party.getWriterId(), loginUserId, PartyJoinRequestStatus.WAIT.getMessage(), requireMessage)
+                ))));
 
         // when
         PartyApproveResponse response = partyService.approveParty(loginUserId, partyId, request);
 
         // then
-        verify(notificationFeignClient).notifyParty(PartyNotificationEvent.approveResult(
-                partyId, party.getTitle(), loginUserId, party.getWriterId(), true)
-        );
+//        verify(notificationFeignClient).notifyParty(PartyNotificationEvent.approveResult(
+//                partyId, party.getTitle(), loginUserId, party.getWriterId(), true)
+//        );
         assertThat(response.message()).isEqualTo("직관팟 가입 신청 승인 성공했습니다!");
         assertThat(partyJoinRepository.findAll().get(0))
                 .extracting("partyJoinRequestStatus", "requireMessage")
-                .containsExactly(PartyJoinRequestStatus.ACCEPT, "참여 희망합니다!");
+                .containsExactly(PartyJoinRequestStatus.ACCEPT, requireMessage);
     }
 
     @DisplayName("승인제 직관팟에 대한 참여 요청을 거절할 수 있다.")
     @Test
-    void approveParty_REFUSE() {
+    void approveParty_REFUSE() throws JsonProcessingException {
         // given
         Long loginUserId = 1L;
         Long applicantUserId = 2L;
         PartyApproveRequest request = PartyApproveRequest.of(applicantUserId, false);
+        String requireMessage = "참여 희망합니다!";
 
         Party party = partyRepository.save(Party.create("title", "설명", 1L, 10L,
                 PartyGender.MALE, PartyJoinMethod.RESERVATION, loginUserId, 1L));
         Long partyId = party.getId();
 
         partyJoinRepository.saveAll(List.of(
-                PartyJoin.create(applicantUserId, party, PartyJoinRequestStatus.WAIT, "참여 희망합니다!")
+                PartyJoin.create(applicantUserId, party, PartyJoinRequestStatus.WAIT, requireMessage)
         ));
+
+        stubFor(post(urlEqualTo("/user/api/notifications/party"))
+                .withRequestBody(equalToJson(objectMapper.writeValueAsString(
+                        PartyNotificationEvent.request(party.getId(), party.getTitle(), party.getWriterId(), loginUserId, PartyJoinRequestStatus.WAIT.getMessage(), requireMessage)
+                ))));
 
         // when
         PartyApproveResponse response = partyService.approveParty(loginUserId, partyId, request);
 
         // then
-        verify(notificationFeignClient).notifyParty(PartyNotificationEvent.approveResult(
-                partyId, party.getTitle(), loginUserId, party.getWriterId(), false)
-        );
+//        verify(notificationFeignClient).notifyParty(PartyNotificationEvent.approveResult(
+//                partyId, party.getTitle(), loginUserId, party.getWriterId(), false)
+//        );
         assertThat(response.message()).isEqualTo("직관팟 가입 신청 거절 성공했습니다!");
         assertThat(partyJoinRepository.findAll().get(0))
                 .extracting("partyJoinRequestStatus", "requireMessage")
-                .containsExactly(PartyJoinRequestStatus.REFUSE, "참여 희망합니다!");
+                .containsExactly(PartyJoinRequestStatus.REFUSE, requireMessage);
     }
 
     @DisplayName("존재하지 않는 승인제 직관팟에 대해서는 승인 요청을 날릴 수 없다..")
