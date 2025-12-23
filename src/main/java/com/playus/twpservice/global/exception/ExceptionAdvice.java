@@ -96,7 +96,8 @@ public class ExceptionAdvice {
             PartyException.InsufficientPartyParticipantsException.class,
             PartyJoinDocumentException.DuplicateApplyException.class,
             PartyException.AlreadyCreatedPartyForPerMatchException.class,
-            PartyException.AlreadyTerminatedException.class
+            PartyException.AlreadyTerminatedException.class,
+            LockAcquireFailException.class
     })
     public ErrorResponse handleConflictException(Exception e) {
         String errorMessage = e.getMessage();
@@ -113,7 +114,9 @@ public class ExceptionAdvice {
     }
 
     @ResponseStatus(INTERNAL_SERVER_ERROR)
-    @ExceptionHandler(Exception.class)
+    @ExceptionHandler(value = {
+            Exception.class
+    })
     public ErrorResponse handleOtherException(Exception e) {
         String errorMessage = e.getMessage();
         log.error("Unexpected Error: {}", errorMessage);
