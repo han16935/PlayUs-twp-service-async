@@ -18,10 +18,10 @@ public class MongoConfig {
         return new SimpleMongoClientDatabaseFactory(uri);
     }
 
-    @Bean(name = "chatMongoDbFactory")
-    public MongoDatabaseFactory chatMongoDbFactory(@Value("${spring.data.mongodb.chat.uri}") String uri) {
-        return new SimpleMongoClientDatabaseFactory(uri);
-    }
+//    @Bean(name = "chatMongoDbFactory")
+//    public MongoDatabaseFactory chatMongoDbFactory(@Value("${spring.data.mongodb.chat.uri}") String uri) {
+//        return new SimpleMongoClientDatabaseFactory(uri);
+//    }
 
 
 
@@ -31,9 +31,9 @@ public class MongoConfig {
         return new MongoTemplate(factory);
     }
 
-    @Bean(name = "chatMongoTemplate")
-    public MongoTemplate chatMongoTemplate(@Qualifier("chatMongoDbFactory") MongoDatabaseFactory factory) {
-        return new MongoTemplate(factory);
-    }
+//    @Bean(name = "chatMongoTemplate")
+//    public MongoTemplate chatMongoTemplate(@Qualifier("chatMongoDbFactory") MongoDatabaseFactory factory) {
+//        return new MongoTemplate(factory);
+//    }
 }
 

@@ -1,8 +1,6 @@
 package com.playus.twpservice.domain.party.repository.write;
 
 import com.playus.twpservice.IntegrationTestSupport;
-import com.playus.twpservice.domain.chat.entity.ChatRoom;
-import com.playus.twpservice.domain.chat.repository.write.ChatRoomRepository;
 import com.playus.twpservice.domain.party.entity.Party;
 import com.playus.twpservice.domain.party.entity.PartyThumbnailUrl;
 import com.playus.twpservice.domain.party.enums.PartyGender;
@@ -24,8 +22,6 @@ class PartyThumbnailUrlRepositoryTest extends IntegrationTestSupport {
 
     @Autowired
     PartyThumbnailUrlRepository partyThumbnailUrlRepository;
-    @Autowired
-    private ChatRoomRepository chatRoomRepository;
 
     @AfterEach
     void tearDown() {
@@ -39,11 +35,10 @@ class PartyThumbnailUrlRepositoryTest extends IntegrationTestSupport {
         // given
         Long writerId = 1L;
         Long matchId = 1L;
-        ChatRoom chatRoom = chatRoomRepository.save(ChatRoom.create());
 
         Party party = partyRepository.save(Party.create(
                 "title2", "16일 경기 같이 보실 분~", 1L, 15L,
-                PartyGender.FEMALE, PartyJoinMethod.RESERVATION, writerId, matchId, chatRoom)
+                PartyGender.FEMALE, PartyJoinMethod.RESERVATION, writerId, matchId)
         );
 
         LocalDateTime now = LocalDateTime.now();

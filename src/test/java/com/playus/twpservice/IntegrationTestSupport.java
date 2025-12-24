@@ -1,7 +1,7 @@
 package com.playus.twpservice;
 
 
-import com.playus.twpservice.global.s3.S3Service;
+//import com.playus.twpservice.global.s3.S3Service;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.DynamicPropertyRegistry;
@@ -30,8 +30,8 @@ public abstract class IntegrationTestSupport extends OpenFeignClientTestSupport 
     private static final int REDIS_PORT = 6379;
     private static final int MONGO_PORT = 27017;
 
-    @MockitoBean
-    protected S3Service s3Service;
+//    @MockitoBean
+//    protected S3Service s3Service;
 
     static {
         mySQL = new MySQLContainer<>(MYSQL_VERSION)

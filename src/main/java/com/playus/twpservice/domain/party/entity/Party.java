@@ -1,6 +1,5 @@
 package com.playus.twpservice.domain.party.entity;
 
-import com.playus.twpservice.domain.chat.entity.ChatRoom;
 import com.playus.twpservice.domain.common.data.BaseTimeEntity;
 import com.playus.twpservice.domain.party.dto.update.PartyUpdateRequest;
 import com.playus.twpservice.domain.party.enums.PartyJoinMethod;
@@ -61,9 +60,9 @@ public class Party extends BaseTimeEntity {
     @Column(nullable = false, name = "match_id")
     private Long matchId;
 
-    @OneToOne
-    @JoinColumn(nullable = false, name = "chat_room_id")
-    private ChatRoom chatRoom;
+//    @OneToOne
+//    @JoinColumn(nullable = false, name = "chat_room_id")
+//    private ChatRoom chatRoom;
 
     @Column(nullable = false, columnDefinition = "TEXT")
     private String text;
@@ -74,7 +73,7 @@ public class Party extends BaseTimeEntity {
     private LocalDateTime deletedAt;
 
     @Builder
-    private Party(Long id, String title, String text, Long minimumParticipants, Long maximumParticipants, PartyGender partyGender, PartyJoinMethod partyJoinMethod, Long writerId, Long matchId, ChatRoom chatRoom) {
+    private Party(Long id, String title, String text, Long minimumParticipants, Long maximumParticipants, PartyGender partyGender, PartyJoinMethod partyJoinMethod, Long writerId, Long matchId) {
         this.id = id;
         this.title = title;
         this.text = text;
@@ -84,7 +83,6 @@ public class Party extends BaseTimeEntity {
         this.partyJoinMethod = partyJoinMethod;
         this.writerId = writerId;
         this.matchId = matchId;
-        this.chatRoom = chatRoom;
     }
 
     // setter
@@ -122,7 +120,7 @@ public class Party extends BaseTimeEntity {
     }
 
     public static Party create(String title, String text, Long minimumParticipants, Long maximumParticipants,
-                               PartyGender partyGender, PartyJoinMethod partyJoinMethod, Long writerId, Long matchId, ChatRoom chatRoom) {
+                               PartyGender partyGender, PartyJoinMethod partyJoinMethod, Long writerId, Long matchId) {
         return Party.builder()
                 .title(title)
                 .text(text)
@@ -132,7 +130,6 @@ public class Party extends BaseTimeEntity {
                 .partyJoinMethod(partyJoinMethod)
                 .writerId(writerId)
                 .matchId(matchId)
-                .chatRoom(chatRoom)
                 .build();
     }
 

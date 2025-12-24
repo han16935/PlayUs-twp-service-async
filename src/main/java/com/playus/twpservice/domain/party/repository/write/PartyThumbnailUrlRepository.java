@@ -13,7 +13,7 @@ public interface PartyThumbnailUrlRepository extends JpaRepository<PartyThumbnai
 
     @Modifying
     @Query("UPDATE PartyThumbnailUrl p SET p.deletedAt = CURRENT_TIMESTAMP WHERE p.party.id = :partyId")
-    void deleteByPartyId(Long partyId);
+    void deleteByPartyId(@Param("partyId") Long partyId);
 
     @Query(value = "SELECT * FROM party_thumbnail_url WHERE deleted_at IS NOT NULL AND deleted_at < :threshold", nativeQuery = true)
     List<PartyThumbnailUrl> findAllDeletedPartyThumbnailUrlBefore(@Param("threshold") LocalDateTime threshold);

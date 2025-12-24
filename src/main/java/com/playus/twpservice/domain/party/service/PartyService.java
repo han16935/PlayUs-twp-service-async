@@ -1,11 +1,5 @@
 package com.playus.twpservice.domain.party.service;
 
-import com.playus.twpservice.domain.chat.entity.ChatParticipant;
-import com.playus.twpservice.domain.chat.entity.ChatRoom;
-import com.playus.twpservice.domain.chat.repository.message.ChatMessageRepository;
-import com.playus.twpservice.domain.chat.repository.write.ChatParticipantRepository;
-import com.playus.twpservice.domain.chat.repository.write.ChatRoomRepository;
-import com.playus.twpservice.domain.chat.service.ChatRoomService;
 import com.playus.twpservice.domain.common.security.CustomOAuth2User;
 import com.playus.twpservice.domain.common.security.Gender;
 import com.playus.twpservice.domain.party.assertion.PartyAssert;
@@ -41,15 +35,14 @@ import com.playus.twpservice.domain.party.repository.write.PartyAgeRepository;
 import com.playus.twpservice.domain.party.repository.write.PartyJoinRepository;
 import com.playus.twpservice.domain.party.repository.write.PartyRepository;
 import com.playus.twpservice.domain.party.repository.write.PartyThumbnailUrlRepository;
-import com.playus.twpservice.global.s3.S3Service;
-import jakarta.validation.constraints.Min;
+//import com.playus.twpservice.global.s3.S3Service;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 import static com.playus.twpservice.domain.party.exception.entity.PartyException.*;
 
@@ -63,33 +56,33 @@ public class PartyService {
     private final PartyAgeRepository partyAgeRepository;
     private final PartyThumbnailUrlRepository partyThumbnailUrlRepository;
 
-    private final ChatRoomRepository chatRoomRepository;
-    private final ChatParticipantRepository chatParticipantRepository;
-    private final ChatMessageRepository chatMessageRepository;
-    private final ChatRoomService chatRoomService;
+    private final ApplicationEventPublisher eventPublisher;
+//    private final ChatRoomRepository chatRoomRepository;
+//    private final ChatParticipantRepository chatParticipantRepository;
+//    private final ChatMessageRepository chatMessageRepository;
+//    private final ChatRoomService chatRoomService;
 
     private final PartyReadOnlyRepository partyReadOnlyRepository;
     private final PartyJoinReadOnlyRepository partyJoinReadOnlyRepository;
     private final PartyAgeReadOnlyRepository partyAgeReadOnlyRepository;
 
     private final NotificationFeignClient notificationFeignClient;
-    private final S3Service s3Service;
+//    private final S3Service s3Service;
 
     public PartyCreateResponse createParty(Long userId, PartyCreateRequest request) {
-        ChatRoom chatRoom = initializeChatRoomAsWriter(userId);
 
-        if (partyReadOnlyRepository.existsByWriterId(userId)) {
+        if (partyRepository.existsByWriterId(userId)) {
             throw new AlreadyCreatedPartyForPerMatchException("하나의 경기에 대해 하나의 직관팟만 만들 수 있습니다!");
         }
 
-        Party party = partyRepository.save(request.toPartyWith(userId, chatRoom));
+        Party party = partyRepository.save(request.toPartyWith(userId));
 
         List<PartyAge> partyAgeList = toPartyAgeEntity(request, party);
         partyAgeRepository.saveAll(partyAgeList);
 
         saveThumbnailUrlIfPresent(request, party);
 
-        return PartyCreateResponse.of(party.getId(), chatRoom.getId());
+        return PartyCreateResponse.of(party.getId());
     }
 
     public PartyUpdateResponse updateParty(Long userId, PartyIdRequest idRequest, PartyUpdateRequest updateRequest) {
@@ -121,12 +114,6 @@ public class PartyService {
         partyJoinRepository.deleteByPartyId(partyId);
         partyRepository.deleteById(partyId);
 
-        Long chatRoomId = partyDocument.getChatRoomId();
-
-        chatMessageRepository.deleteAllByChatRoomId(chatRoomId);
-        chatParticipantRepository.deleteByChatRoomId(chatRoomId);
-        chatRoomRepository.deleteById(chatRoomId);
-
         return PartyDeleteResponse.of(partyId);
     }
 
@@ -152,14 +139,14 @@ public class PartyService {
 
         Long userId = validateApplyCondition(oauth2User, partyId, party);
 
-        partyJoinRepository.save(PartyJoin.create(userId, party, PartyJoinRequestStatus.ACCEPT, null));
         party.increaseCurrentParticipants();
+        partyJoinRepository.save(PartyJoin.create(userId, party, PartyJoinRequestStatus.ACCEPT, null));
 
-        notificationFeignClient.notifyParty(PartyNotificationEvent.joined(
-                party.getId(), party.getTitle(), party.getWriterId(), userId
-        ));
-
-        chatParticipantRepository.save(ChatParticipant.of(party.getChatRoom(), userId));
+        eventPublisher.publishEvent(
+                PartyNotificationEvent.joined(
+                        party.getId(), party.getTitle(), party.getWriterId(), userId
+                )
+        );
     }
 
     public PartyApplyResponse applyParty(CustomOAuth2User oauth2User, Long partyId, String requireMessage) {
@@ -170,15 +157,13 @@ public class PartyService {
 
         partyJoinRepository.save(PartyJoin.create(userId, party, PartyJoinRequestStatus.WAIT, requireMessage));
 
-        notificationFeignClient.notifyParty(PartyNotificationEvent.request(
-                partyId, party.getTitle(), party.getWriterId(), userId, PartyJoinRequestStatus.WAIT.getMessage(), requireMessage
-        ));
+        eventPublisher.publishEvent(
+                PartyNotificationEvent.request(
+                        partyId, party.getTitle(), party.getWriterId(), userId, PartyJoinRequestStatus.WAIT.getMessage(), requireMessage
+                )
+        );
 
         return PartyApplyResponse.of("직관팟 신청에 성공했습니다!");
-    }
-
-    public PresignedUrlForSaveImageResponse generatePresignedUrlForSaveImage(PresignedUrlForSaveImageRequest request) {
-        return new PresignedUrlForSaveImageResponse(s3Service.generatePresignedUrl(request.imageFileName()));
     }
 
     // 나이, 성별 검증은 이전 승인제 직관팟 신청에서 검증함!
@@ -208,20 +193,27 @@ public class PartyService {
             party.increaseCurrentParticipants();
             partyJoin.approve();
             partyJoinRepository.save(partyJoin);
-            notificationFeignClient.notifyParty(PartyNotificationEvent.approveResult(
-                    partyId, party.getTitle(), writerId, loginUserId, true)
+
+            eventPublisher.publishEvent(
+                    PartyNotificationEvent.approveResult(
+                            partyId, party.getTitle(), writerId, loginUserId, true)
             );
+//            notificationFeignClient.notifyParty(PartyNotificationEvent.approveResult(
+//                    partyId, party.getTitle(), writerId, loginUserId, true)
+//            );
         } else {
             partyJoin.refuse();
             partyJoinRepository.save(partyJoin);
-            notificationFeignClient.notifyParty(PartyNotificationEvent.approveResult(
-                    partyId, party.getTitle(), writerId, loginUserId, false)
+            eventPublisher.publishEvent(
+                    PartyNotificationEvent.approveResult(
+                            partyId, party.getTitle(), writerId, loginUserId, false)
             );
+
+//            notificationFeignClient.notifyParty(PartyNotificationEvent.approveResult(
+//                    partyId, party.getTitle(), writerId, loginUserId, false)
+//            );
             return PartyApproveResponse.of("직관팟 가입 신청 거절 성공했습니다!");
         }
-
-        // 5. partyId와 user 가진 ChatPart 저장
-        chatParticipantRepository.save(ChatParticipant.of(party.getChatRoom(), applicantUserId));
 
         // 6. response return
         return PartyApproveResponse.of("직관팟 가입 신청 승인 성공했습니다!");
@@ -238,8 +230,6 @@ public class PartyService {
                 .orElseThrow(() -> new ApplicantNotFoundException("직관팟에 참여한 사람만 탈퇴할 수 있습니다!"));
 
         PartyAssert.isAcceptedUser(partyJoin.getPartyJoinRequestStatus());
-
-        chatRoomService.exitChatRoom(party.getChatRoom().getId(), loginUserId);
 
         partyJoinRepository.delete(partyJoin);
         party.decreaseCurrentMember();
@@ -276,11 +266,11 @@ public class PartyService {
 
         PartyAssert.isParticipatedPartyAsWriter(userId, party.getWriterId(), "직관팟 작성자는 지원할 수 없습니다!");
 
-        throwIfAlreadyAppliedToParty(userId, partyId);
+//        throwIfAlreadyAppliedToParty(userId, partyId);
 
-        List<PartyAgeGroup> partyAgeGroupList = partyAgeReadOnlyRepository.findByPartyId(party.getId())
+        List<PartyAgeGroup> partyAgeGroupList = partyAgeRepository.findByPartyId(party.getId())
                 .stream()
-                .map(partyAgeDocument -> PartyAgeGroup.getAgeGroupByAge(partyAgeDocument.getAge()))
+                .map(partyAge -> PartyAgeGroup.getAgeGroupByAge(partyAge.getAge()))
                 .toList();
 
         PartyAssert.isAppliableParty(party, partyAgeGroupList, userGender, userAgeGroup);
@@ -303,12 +293,6 @@ public class PartyService {
                         .map(thumbnailUrl -> PartyThumbnailUrl.create(savedParty, thumbnailUrl))
                         .toList()
         );
-    }
-
-    private ChatRoom initializeChatRoomAsWriter(Long userId) {
-        ChatRoom chatRoom = chatRoomRepository.save(ChatRoom.create());
-        chatParticipantRepository.save(ChatParticipant.of(chatRoom, userId));
-        return chatRoom;
     }
 
     private void saveThumbnailUrlIfPresent(PartyCreateRequest request, Party party) {
