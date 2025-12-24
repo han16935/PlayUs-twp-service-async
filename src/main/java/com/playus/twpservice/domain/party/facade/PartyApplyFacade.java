@@ -12,13 +12,11 @@ import org.springframework.stereotype.Component;
 
 import java.util.concurrent.TimeUnit;
 
-
-@Slf4j
 @Component
 @RequiredArgsConstructor
 public class PartyApplyFacade {
 
-    @Value("${lock.try-timeout.apply-party:500}")
+    @Value("${lock.try-timeout.apply-party:100}")
     private int tryLockTime;
 
     private final RedissonClient redissonClient;
