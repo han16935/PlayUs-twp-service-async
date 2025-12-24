@@ -40,6 +40,10 @@ thread-pool:
     max-size: 100
     queue-capacity: 10
 
+lock:
+  try-timeout:
+    apply-party: 10000 # 10 * 1000 (10s)
+
 logging:
   level:
     org:

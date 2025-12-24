@@ -45,6 +45,12 @@ thread-pool:
     max-size: ${NOTI_THREAD_MAX_SIZE}
     queue-capacity: ${NOTI_THREAD_QUEUE_CAPACITY}
 
+
+lock:
+  try-timeout:
+    apply-party: ${APPLY_PARTY_LOCK_TRY_TIMEOUT}
+
+
 resilience4j:
   circuitbreaker:
     configs:
