@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.util.concurrent.TimeUnit;
@@ -17,6 +18,9 @@ import java.util.concurrent.TimeUnit;
 @RequiredArgsConstructor
 public class PartyApplyFacade {
 
+    @Value("${lock.try-timeout.apply-party:500}")
+    private int tryLockTime;
+
     private final RedissonClient redissonClient;
     private final PartyService partyService;
 
@@ -24,7 +28,7 @@ public class PartyApplyFacade {
         RLock lock = redissonClient.getLock(partyId.toString());
         boolean isLocked = false;
         try {
-            isLocked = lock.tryLock(0, TimeUnit.MILLISECONDS);
+            isLocked = lock.tryLock(tryLockTime, TimeUnit.MILLISECONDS);
             if (isLocked) {
                 partyService.applyPartyFCFS(oauth2User, partyId);
             }
